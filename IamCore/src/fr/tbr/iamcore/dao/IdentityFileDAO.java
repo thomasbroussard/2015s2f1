@@ -1,6 +1,7 @@
 package fr.tbr.iamcore.dao;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,11 +58,10 @@ public class IdentityFileDAO {
 			result.add(id);
 		}
 
-		scanner.reset();
 		return result;
 	}
 
-	public List<Identity> search(Identity criteria) {
+	public List<Identity> search(Identity criteria) throws FileNotFoundException {
 		List<Identity> resultsList = new ArrayList<Identity>();
 
 		while (scanner.hasNext()) {
@@ -81,7 +81,9 @@ public class IdentityFileDAO {
 				resultsList.add(id);
 			}
 		}
-		scanner.reset();
+		//TODO find a more performant way to reset the scanner
+		scanner.close();
+		scanner = new Scanner(new File(path));
 		
 		
 		return resultsList;
