@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import fr.tbr.iamcore.datamodel.Identity;
 import fr.tbr.iamcore.services.match.Matcher;
+import fr.tbr.iamcore.services.match.impl.ContainsIdentityMatcher;
 import fr.tbr.iamcore.services.match.impl.StartsWithIdentityMatcher;
 
 /**
@@ -27,7 +28,7 @@ public class IdentityFileDAO {
 	private Scanner scanner;
 	private PrintWriter writer;
 
-	private Matcher<Identity> activeMatchingStrategy = new StartsWithIdentityMatcher();
+	private Matcher<Identity> activeMatchingStrategy = new ContainsIdentityMatcher();
 	
 	public IdentityFileDAO() throws Exception {
 		initIO();
@@ -53,19 +54,17 @@ public class IdentityFileDAO {
 	/**
 	 * 
 	 * @return
+	 * @throws FileNotFoundException 
 	 */
-	public List<Identity> readAll() {
+	public List<Identity> readAll() throws FileNotFoundException {
 		List<Identity> result = new ArrayList<Identity>();
 		while (scanner.hasNext()) {
 			result.add(readIdentity(scanner));
 		}
 
-		try {
-			resetScanner(scanner);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		resetScanner(scanner);
+
+
 		return result;
 	}
 
