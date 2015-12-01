@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import fr.tbr.iamcore.datamodel.Identity;
+import fr.tbr.iamcore.services.match.Matcher;
+import fr.tbr.iamcore.services.match.impl.StartsWithIdentityMatcher;
 
 /**
  * The main DAO for the Identity Class
@@ -25,6 +27,8 @@ public class IdentityFileDAO {
 	private Scanner scanner;
 	private PrintWriter writer;
 
+	private Matcher<Identity> activeMatchingStrategy = new StartsWithIdentityMatcher();
+	
 	public IdentityFileDAO() throws Exception {
 		initIO();
 	}
@@ -53,48 +57,42 @@ public class IdentityFileDAO {
 	public List<Identity> readAll() {
 		List<Identity> result = new ArrayList<Identity>();
 		while (scanner.hasNext()) {
-
-			scanner.nextLine();
-			String displayName = scanner.nextLine();
-			String email = scanner.nextLine();
-			String uid = scanner.nextLine();
-			scanner.nextLine();
-			Identity id = new Identity(uid, email, displayName);
-			result.add(id);
+			result.add(readIdentity(scanner));
 		}
 
+		try {
+			resetScanner(scanner);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 	}
 
-	public List<Identity> search(Identity criteria) throws FileNotFoundException {
+	public List<Identity> search(Identity criteria)
+			throws FileNotFoundException {
 		List<Identity> resultsList = new ArrayList<Identity>();
-
 		while (scanner.hasNext()) {
-
-			scanner.nextLine();
-			String displayName = scanner.nextLine();
-			String email = scanner.nextLine();
-			String uid = scanner.nextLine();
-			scanner.nextLine();
-			Identity id = new Identity(uid, email, displayName);
+			Identity id = readIdentity(scanner);
 			// before to add the "id" into the list, lets check that it is
 			// corresponding to the given criteria
-
-			if (email.equals(criteria.getEmail())
-					|| displayName.equals(criteria.getDisplayName())) {
-				//it is matching, add the found identity in the resultlist
+			if (activeMatchingStrategy.match(criteria, id)){
+				// it is matching, add the found identity in the resultlist
 				resultsList.add(id);
 			}
 		}
-		//TODO find a clever way to reset the scanner
-		scanner.close();
-		scanner = new Scanner(new File(path));
-		
-		
+
+		resetScanner(scanner);
 		return resultsList;
 	}
-	
-	private Identity readIdentity(Scanner scannerInstance){
+
+	private void resetScanner(Scanner scannerInstance)
+			throws FileNotFoundException {
+		scannerInstance.close();
+		scannerInstance = new Scanner(new File(path));
+	}
+
+	private Identity readIdentity(Scanner scannerInstance) {
 		scannerInstance.nextLine();
 		String displayName = scannerInstance.nextLine();
 		String email = scannerInstance.nextLine();
@@ -102,48 +100,46 @@ public class IdentityFileDAO {
 		scannerInstance.nextLine();
 		return new Identity(uid, email, displayName);
 	}
-	
 
-	private Identity getById(String searchedUid){
-		
+	private Identity getById(String searchedUid) {
+
 		Identity resultIdentity = null;
 		while (scanner.hasNext()) {
 			Identity id = readIdentity(scanner);
 			// before to add the "id" into the list, lets check that it is
 			// corresponding to the given criteria
 			if (searchedUid.equals(id.getUid())) {
-				//it is matching, add the found identity in the resultlist
+				// it is matching, add the found identity in the resultlist
 				resultIdentity = id;
 			}
 		}
 		return resultIdentity;
 	}
-	
-	public void update(Identity identity) throws Exception{
-		//first, search the passed identity in the file
-		Identity foundIndentity = getById(identity.getUid());
-		
-		//create an other file to save the new content
-		File file = new File(path+"-new");
+
+	public void update(Identity identity) throws Exception {
+
+		// create an other file to save the new content
+		File file = new File(path + "-new");
 		PrintWriter newPrinter = new PrintWriter(file);
-		
-		while(scanner.hasNext()){
+
+		while (scanner.hasNext()) {
 			Identity id = readIdentity(scanner);
-			if (!identity.getUid().equals((id.getUid()))){
-					writeIdentity(id, newPrinter);
+			if (!identity.getUid().equals((id.getUid()))) {
+				writeIdentity(id, newPrinter);
 			}
 		}
 		writeIdentity(identity, newPrinter);
-		writer.close();
 		newPrinter.close();
-		scanner.close();
-		File oldFile = new File(path);
-		Files.delete(oldFile.toPath());
-		Files.move(file.toPath(), oldFile.toPath());
+		close();
+		replace(new File(path), file);
 		initIO();
 	}
-	
-	
+
+	private void replace(File oldFile, File newFile) throws IOException {
+		Files.delete(oldFile.toPath());
+		Files.move(newFile.toPath(), oldFile.toPath());
+	}
+
 	/**
 	 * This method will check that the file exists or create it if it doesn't
 	 * 

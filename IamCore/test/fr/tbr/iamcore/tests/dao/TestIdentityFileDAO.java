@@ -1,5 +1,7 @@
 package fr.tbr.iamcore.tests.dao;
 
+import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 import fr.tbr.iamcore.dao.IdentityFileDAO;
@@ -10,11 +12,47 @@ public class TestIdentityFileDAO {
 	public static void main(String... args) throws Exception {
 		
 		
-		testCreateAndSearch();
+	//testCreateAndSearch();
+		
+		testUpdate();
 		
 		
 		
+	}
+
+
+	private static void testUpdate() throws Exception, FileNotFoundException {
+		//set the context
+		IdentityFileDAO dao = new IdentityFileDAO();
+		dao.create(new Identity("123456", "test@test.com", "test identity"));
 		
+		//This should return at least one result
+		List<Identity> list = dao.search(new Identity(null, "te", "test"));
+		
+		Identity foundIdentity = list.get(0);
+		System.out.println("found this identity :");
+		System.out.println(foundIdentity);
+		System.out.println();
+		
+		//change the value of that identity
+		foundIdentity.setDisplayName("updated test identity");
+		System.out.println("modified this identity : ");
+		System.out.println(foundIdentity);
+		System.out.println();
+		
+		//try to update using the dao
+		dao.update(foundIdentity);
+		
+		//check the result
+		//checking that the old criteria resolves nothing
+		list = dao.search(new Identity(null, "te", "test"));
+		System.out.println("this should not contain the original identity");
+		System.out.println(list);
+		
+		//checking that the new version can be found in the file
+		list= dao.search(new Identity(null, "te", "updated"));
+		System.out.println("this should contain the new version of the identity");
+		System.out.println(list);
 	}
 
 	
