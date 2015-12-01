@@ -34,12 +34,16 @@ public class IdentityFileDAO {
 	 * @param identity
 	 */
 	public void create(Identity identity) {
-		writer.println("--- identity:begin ---");
-		writer.println(identity.getDisplayName());
-		writer.println(identity.getEmail());
-		writer.println(identity.getUid());
-		writer.println("--- identity:end---");
-		writer.flush();
+		writeIdentity(identity, writer);
+	}
+
+	private void writeIdentity(Identity identity, PrintWriter printWriter) {
+		printWriter.println("--- identity:begin ---");
+		printWriter.println(identity.getDisplayName());
+		printWriter.println(identity.getEmail());
+		printWriter.println(identity.getUid());
+		printWriter.println("--- identity:end---");
+		printWriter.flush();
 	}
 
 	/**
@@ -89,20 +93,25 @@ public class IdentityFileDAO {
 		
 		return resultsList;
 	}
+	
+	private Identity readIdentity(Scanner scannerInstance){
+		scannerInstance.nextLine();
+		String displayName = scannerInstance.nextLine();
+		String email = scannerInstance.nextLine();
+		String uid = scannerInstance.nextLine();
+		scannerInstance.nextLine();
+		return new Identity(uid, email, displayName);
+	}
+	
 
 	private Identity getById(String searchedUid){
 		
 		Identity resultIdentity = null;
 		while (scanner.hasNext()) {
-			scanner.nextLine();
-			String displayName = scanner.nextLine();
-			String email = scanner.nextLine();
-			String uid = scanner.nextLine();
-			scanner.nextLine();
-			Identity id = new Identity(uid, email, displayName);
+			Identity id = readIdentity(scanner);
 			// before to add the "id" into the list, lets check that it is
 			// corresponding to the given criteria
-			if (searchedUid.equals(uid)) {
+			if (searchedUid.equals(id.getUid())) {
 				//it is matching, add the found identity in the resultlist
 				resultIdentity = id;
 			}
@@ -119,25 +128,12 @@ public class IdentityFileDAO {
 		PrintWriter newPrinter = new PrintWriter(file);
 		
 		while(scanner.hasNext()){
-			scanner.nextLine();
-			String displayName = scanner.nextLine();
-			String email = scanner.nextLine();
-			String uid = scanner.nextLine();
-			scanner.nextLine();
-			if (!identity.getUid().equals((uid))){
-				newPrinter.println("--- identity:begin ---");
-				newPrinter.println(displayName);
-				newPrinter.println(email);
-				newPrinter.println(uid);
-				newPrinter.println("--- identity:end ---");
-				newPrinter.flush();
+			Identity id = readIdentity(scanner);
+			if (!identity.getUid().equals((id.getUid()))){
+					writeIdentity(id, newPrinter);
 			}
 		}
-		newPrinter.println("--- identity:begin ---");
-		newPrinter.println(identity.getDisplayName());
-		newPrinter.println(identity.getEmail());
-		newPrinter.println(identity.getUid());
-		newPrinter.println("--- identity:end ---");
+		writeIdentity(identity, newPrinter);
 		writer.close();
 		newPrinter.close();
 		scanner.close();
