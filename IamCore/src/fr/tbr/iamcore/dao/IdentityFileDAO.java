@@ -63,7 +63,7 @@ public class IdentityFileDAO {
 			result.add(readIdentity(scanner));
 		}
 
-		resetScanner(scanner);
+		resetScanner();
 		return result;
 	}
 
@@ -79,14 +79,15 @@ public class IdentityFileDAO {
 			}
 		}
 
-		resetScanner(scanner);
+		resetScanner();
 		return resultsList;
 	}
 
-	private void resetScanner(Scanner scannerInstance) {
+	private void resetScanner() {
 		try {
-			scannerInstance.close();
-			scannerInstance = new Scanner(new File(path));
+			this.scanner.close();
+			//beware, if you change the reference for the parameter, this one won't be affected
+			this.scanner = new Scanner(new File(path));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
