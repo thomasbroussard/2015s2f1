@@ -13,6 +13,9 @@ public class Identity {
 	private String displayName;
 	
 	
+	public Identity() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	
 	/**

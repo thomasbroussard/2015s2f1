@@ -22,7 +22,7 @@ import fr.tbr.iamcore.services.match.impl.ContainsIdentityMatcher;
  * @author tbrou
  *
  */
-public class IdentityFileDAO {
+public class IdentityFileDAO implements IdentityDAOInterface{
 
 	private static final String path = "/tests/iam/identities.txt";
 
@@ -183,6 +183,12 @@ public class IdentityFileDAO {
 	public void close() {
 		this.scanner.close();
 		this.writer.close();
+	}
+
+	@Override
+	public void delete(Identity identity) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 # TODO (18/12/2015)
 * Design some custom exceptions based on the DaoUpdateException model
+* Check the "reflection" mechanisms in Java, maybe to handle the switch case in the xmldao
 
 
 # TODO (01/12/2015)

@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
 
+import fr.tbr.iamcore.dao.IdentityDAOInterface;
 import fr.tbr.iamcore.dao.IdentityFileDAO;
+import fr.tbr.iamcore.dao.IdentityXmlDAO;
 import fr.tbr.iamcore.datamodel.Identity;
 
 public class TestIdentityFileDAO {
@@ -23,7 +25,7 @@ public class TestIdentityFileDAO {
 
 	private static void testUpdate() throws Exception, FileNotFoundException {
 		//set the context
-		IdentityFileDAO dao = new IdentityFileDAO();
+		IdentityDAOInterface dao = new IdentityFileDAO();
 		dao.create(new Identity("123456", "test@test.com", "test identity"));
 		
 		//This should return at least one result
