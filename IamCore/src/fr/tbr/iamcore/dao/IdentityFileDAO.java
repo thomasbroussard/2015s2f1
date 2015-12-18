@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import fr.tbr.iamcore.dao.exceptions.DaoInitializationException;
 import fr.tbr.iamcore.datamodel.Identity;
 import fr.tbr.iamcore.services.match.Matcher;
 import fr.tbr.iamcore.services.match.impl.ContainsIdentityMatcher;
@@ -29,7 +30,7 @@ public class IdentityFileDAO {
 	private PrintWriter writer;
 
 	private Matcher<Identity> activeMatchingStrategy = new ContainsIdentityMatcher();
-	
+
 	public IdentityFileDAO() throws Exception {
 		initIO();
 	}
@@ -54,28 +55,25 @@ public class IdentityFileDAO {
 	/**
 	 * 
 	 * @return
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
-	public List<Identity> readAll() throws FileNotFoundException {
+	public List<Identity> readAll() {
 		List<Identity> result = new ArrayList<Identity>();
 		while (scanner.hasNext()) {
 			result.add(readIdentity(scanner));
 		}
 
 		resetScanner(scanner);
-
-
 		return result;
 	}
 
-	public List<Identity> search(Identity criteria)
-			throws FileNotFoundException {
+	public List<Identity> search(Identity criteria) {
 		List<Identity> resultsList = new ArrayList<Identity>();
 		while (scanner.hasNext()) {
 			Identity id = readIdentity(scanner);
 			// before to add the "id" into the list, lets check that it is
 			// corresponding to the given criteria
-			if (activeMatchingStrategy.match(criteria, id)){
+			if (activeMatchingStrategy.match(criteria, id)) {
 				// it is matching, add the found identity in the resultlist
 				resultsList.add(id);
 			}
@@ -85,10 +83,13 @@ public class IdentityFileDAO {
 		return resultsList;
 	}
 
-	private void resetScanner(Scanner scannerInstance)
-			throws FileNotFoundException {
-		scannerInstance.close();
-		scannerInstance = new Scanner(new File(path));
+	private void resetScanner(Scanner scannerInstance) {
+		try {
+			scannerInstance.close();
+			scannerInstance = new Scanner(new File(path));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Identity readIdentity(Scanner scannerInstance) {
@@ -115,7 +116,7 @@ public class IdentityFileDAO {
 		return resultIdentity;
 	}
 
-	public void update(Identity identity) throws Exception {
+	public void update(Identity identity) {
 
 		// create an other file to save the new content
 		File file = new File(path + "-new");
@@ -145,23 +146,31 @@ public class IdentityFileDAO {
 	 * @param pathname
 	 * @throws IOException
 	 */
-	private void initIO() throws Exception {
-		File file = new File(path);
-		if (!file.exists()) {
-			// creation code after
-			System.out.println("the file does not exists");
-			File parent = file.getParentFile();
-			if (!parent.exists()) {
-				parent.mkdirs();
+	private void initIO() throws DaoInitializationException {
+
+		try {
+			File file = new File(path);
+			if (!file.exists()) {
+				// creation code after
+				System.out.println("the file does not exists");
+				File parent = file.getParentFile();
+				if (!parent.exists()) {
+					parent.mkdirs();
+				}
+				file.createNewFile();
+				System.out.println("file was successfully created");
+			} else {
+				System.out.println("the file already exists");
 			}
-			file.createNewFile();
-			System.out.println("file was successfully created");
-		} else {
-			System.out.println("the file already exists");
+			this.scanner = new Scanner(file);
+			// open the writer
+			this.writer = new PrintWriter(new FileOutputStream(file, true));
+
+		} catch (IOException e) {
+			DaoInitializationException daoInitializationException = new DaoInitializationException();
+			daoInitializationException.initCause(e);
+			throw daoInitializationException;
 		}
-		this.scanner = new Scanner(file);
-		// open the writer
-		this.writer = new PrintWriter(new FileOutputStream(file, true));
 	}
 
 	public void close() {
