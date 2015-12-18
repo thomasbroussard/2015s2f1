@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import fr.tbr.iamcore.dao.exceptions.DaoInitializationException;
+import fr.tbr.iamcore.dao.exceptions.DaoUpdateException;
 import fr.tbr.iamcore.datamodel.Identity;
 import fr.tbr.iamcore.services.match.Matcher;
 import fr.tbr.iamcore.services.match.impl.ContainsIdentityMatcher;
-import fr.tbr.iamcore.services.match.impl.StartsWithIdentityMatcher;
 
 /**
  * The main DAO for the Identity Class
@@ -86,7 +86,8 @@ public class IdentityFileDAO {
 	private void resetScanner() {
 		try {
 			this.scanner.close();
-			//beware, if you change the reference for the parameter, this one won't be affected
+			// beware, if you change the reference for the parameter, this one
+			// won't be affected
 			this.scanner = new Scanner(new File(path));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -117,23 +118,28 @@ public class IdentityFileDAO {
 		return resultIdentity;
 	}
 
-	public void update(Identity identity) {
+	public void update(Identity identity) throws DaoUpdateException {
+		try {
+			// create an other file to save the new content
+			File file = new File(path + "-new");
+			PrintWriter newPrinter = new PrintWriter(file);
 
-		// create an other file to save the new content
-		File file = new File(path + "-new");
-		PrintWriter newPrinter = new PrintWriter(file);
-
-		while (scanner.hasNext()) {
-			Identity id = readIdentity(scanner);
-			if (!identity.getUid().equals((id.getUid()))) {
-				writeIdentity(id, newPrinter);
+			while (scanner.hasNext()) {
+				Identity id = readIdentity(scanner);
+				if (!identity.getUid().equals((id.getUid()))) {
+					writeIdentity(id, newPrinter);
+				}
 			}
+			writeIdentity(identity, newPrinter);
+			newPrinter.close();
+			close();
+			replace(new File(path), file);
+			initIO();
+		} catch (Exception e) {
+			DaoUpdateException due = new DaoUpdateException(identity);
+			due.initCause(e);
+			throw due;
 		}
-		writeIdentity(identity, newPrinter);
-		newPrinter.close();
-		close();
-		replace(new File(path), file);
-		initIO();
 	}
 
 	private void replace(File oldFile, File newFile) throws IOException {
