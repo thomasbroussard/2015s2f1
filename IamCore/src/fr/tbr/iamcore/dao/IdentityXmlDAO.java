@@ -27,6 +27,10 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO handle exception
+		}finally{
+			if (document != null){
+				document.getDocumentElement();
+			}
 		}
 	}
 
@@ -39,7 +43,8 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 			Element identity = (Element) identitiesList.item(i);
 			NodeList properties = identity.getElementsByTagName("property");
 			Identity identityInstance = new Identity();
-			for (int j = 0; j < properties.getLength(); j++) {
+			int propertiesLength = properties.getLength();
+			for (int j = 0; j < propertiesLength; j++) {
 				Element property = (Element) properties.item(j);
 				String attribute = property.getAttribute("name");
 				System.out.println(attribute + " : "
@@ -77,7 +82,7 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 
 	@Override
 	public void update(Identity identity) throws DaoUpdateException {
-		// TODO Auto-generated method stub
+		
 
 	}
 
