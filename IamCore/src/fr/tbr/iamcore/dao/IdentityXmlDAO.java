@@ -13,10 +13,14 @@ import org.w3c.dom.NodeList;
 
 import fr.tbr.iamcore.dao.exceptions.DaoUpdateException;
 import fr.tbr.iamcore.datamodel.Identity;
+import fr.tbr.iamcore.services.match.Matcher;
+import fr.tbr.iamcore.services.match.impl.ContainsIdentityMatcher;
 
 public class IdentityXmlDAO implements IdentityDAOInterface {
 
 	Document document;
+	
+	private Matcher<Identity> activeMatchingStrategy = new ContainsIdentityMatcher();
 
 	public IdentityXmlDAO() {
 		try {
@@ -36,44 +40,60 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 
 	public List<Identity> readAll() {
 
+		//This is creating an anonymous implementation of the Matcher interface and 
+		//instantiating it at the same time
+		return internalSearch(null, new Matcher<Identity>(){
+			public boolean match(Identity criteria, Identity toBeMatched) {
+				return true;
+			}
+		});
+	}
+
+	public List<Identity> search(Identity criteria) {
+			return internalSearch(criteria, activeMatchingStrategy);
+	}
+
+	private List<Identity> internalSearch(Identity criteria, Matcher<Identity> identityMatcher){
 		ArrayList<Identity> resultList = new ArrayList<Identity>();
 		NodeList identitiesList = document.getElementsByTagName("identity");
 		int length = identitiesList.getLength();
 		for (int i = 0; i < length; i++) {
 			Element identity = (Element) identitiesList.item(i);
-			NodeList properties = identity.getElementsByTagName("property");
-			Identity identityInstance = new Identity();
-			int propertiesLength = properties.getLength();
-			for (int j = 0; j < propertiesLength; j++) {
-				Element property = (Element) properties.item(j);
-				String attribute = property.getAttribute("name");
-				System.out.println(attribute + " : "
-						+ property.getTextContent());
-				String value = property.getTextContent().trim();
-				switch (attribute) {
-				case "displayName":
-					identityInstance.setDisplayName(value);
-					break;
-				case "email":
-					identityInstance.setEmail(value);
-					break;
-
-				case "guid":
-					identityInstance.setUid(value);
-					break;
-				}
+			Identity identityInstance = readIdentityFromXmlElement(identity);
+			if(identityMatcher.match(criteria, identityInstance)){
+				resultList.add(identityInstance);
 			}
-			resultList.add(identityInstance);
-
 		}
 
 		return resultList;
+		
 	}
 
-	public List<Identity> search(Identity identity) {
-		return new ArrayList<Identity>();
-	}
+	private Identity readIdentityFromXmlElement(Element identity){
+		NodeList properties = identity.getElementsByTagName("property");
+		Identity identityInstance = new Identity();
+		int propertiesLength = properties.getLength();
+		for (int j = 0; j < propertiesLength; j++) {
+			Element property = (Element) properties.item(j);
+			String attribute = property.getAttribute("name");
+			String value = property.getTextContent().trim();
+			switch (attribute) {
+			case "displayName":
+				identityInstance.setDisplayName(value);
+				break;
+			case "email":
+				identityInstance.setEmail(value);
+				break;
 
+			case "guid":
+				identityInstance.setUid(value);
+				break;
+			}
+		}
+		return identityInstance;
+	}
+	
+	
 	@Override
 	public void create(Identity identity) {
 		// TODO Auto-generated method stub

@@ -16,5 +16,6 @@
 		<property name="displayName">Clement</property>
 		<property name="email">cle@tbr.com</property>
 		<property name="guid">98746541</property>
+		<property name="birthDate">15/03/1973</property>
 	</identity>
 </identities>

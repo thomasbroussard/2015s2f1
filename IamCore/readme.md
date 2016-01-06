@@ -1,3 +1,7 @@
+# TODO (06/01/2015)
+* Improve the IAM software to be able to manage the Identity birth date
+* Improve IdentityXmlDao to manage that date (especially in the readIdentityFromXml mechanism) 
+
 # TODO (18/12/2015)
 * Design some custom exceptions based on the DaoUpdateException model
 * Check the "reflection" mechanisms in Java, maybe to handle the switch case in the xmldao
