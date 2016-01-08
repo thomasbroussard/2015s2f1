@@ -1,7 +1,10 @@
 package fr.tbr.iamcore.dao;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -72,6 +75,7 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 	private Identity readIdentityFromXmlElement(Element identity){
 		NodeList properties = identity.getElementsByTagName("property");
 		Identity identityInstance = new Identity();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		int propertiesLength = properties.getLength();
 		for (int j = 0; j < propertiesLength; j++) {
 			Element property = (Element) properties.item(j);
@@ -87,6 +91,16 @@ public class IdentityXmlDAO implements IdentityDAOInterface {
 
 			case "guid":
 				identityInstance.setUid(value);
+				break;
+				
+			case "birthDate":
+				try {
+					Date parsedDate = simpleDateFormat.parse(value);
+					identityInstance.setBirthDate(parsedDate);
+				} catch (ParseException e) {
+					// TODO Check if the birthDate should provoke the cancellation of the current identity reading
+					e.printStackTrace();
+				}
 				break;
 			}
 		}

@@ -16,12 +16,17 @@ public class TestIdentityFileDAO {
 		
 	//testCreateAndSearch();
 		
-		testUpdate();
+//		testUpdate();
 		
-		
+		readAll();
 		
 	}
 
+	
+	private static void readAll(){
+		IdentityDAOInterface dao = new IdentityXmlDAO();
+		System.out.println(dao.readAll());
+	}
 
 	private static void testUpdate() throws Exception, FileNotFoundException {
 		//set the context

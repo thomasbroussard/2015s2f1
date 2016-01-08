@@ -3,6 +3,8 @@
  */
 package fr.tbr.iamcore.datamodel;
 
+import java.util.Date;
+
 /**
  * @author tbrou
  *
@@ -12,11 +14,12 @@ public class Identity {
 	private String email;
 	private String displayName;
 	
+	private Date birthDate;
+	
 	
 	public Identity() {
 		// TODO Auto-generated constructor stub
 	}
-	
 	
 	/**
 	 * @param uid
@@ -65,13 +68,24 @@ public class Identity {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+
+	
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return "Identity [uid=" + uid + ", email=" + email + ", displayName="
-				+ displayName + "]";
+				+ displayName + ", birthDate=" + birthDate + "]";
 	}
 
 }
