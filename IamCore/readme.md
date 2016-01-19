@@ -1,3 +1,12 @@
+#TODO (19/01/2016)
+* finish the search method of the IdentityJdbcDao
+* implement the create method of the IdentityJdbcDao
+
+#TODO (08/01/2015)
+* make a test case to perform a connection to the database 
+* insert a line into the identities table
+
+
 # TODO (06/01/2015)
 * Improve the IAM software to be able to manage the Identity birth date
 * Improve IdentityXmlDao to manage that date (especially in the readIdentityFromXml mechanism) 
