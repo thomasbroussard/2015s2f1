@@ -41,8 +41,18 @@ public class IdentityJdbcDAO implements IdentityDAOInterface {
 	 */
 	@Override
 	public void create(Identity identity) {
-		// TODO Auto-generated method stub
+		String query = "insert into IDENTITIES (\"DISPLAY_NAME\", \"EMAIL_ADDRESS\", \"BIRTHDATE\", \"UID\") values(?, ?, ?, ?)";
 
+		try {
+			PreparedStatement stmt = this.connection.prepareStatement(query);
+			stmt.setString(1, identity.getDisplayName());
+			stmt.setString(2, identity.getEmail());
+			stmt.setDate(3, new java.sql.Date(identity.getBirthDate().getTime()));
+			stmt.setString(4, identity.getUid());
+			stmt.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -90,7 +100,7 @@ public class IdentityJdbcDAO implements IdentityDAOInterface {
 		Class.forName("org.apache.derby.jdbc.ClientDriver");
 
 		Connection connection = DriverManager.getConnection("jdbc:derby://localhost:1527/IAMDataBase;create=true", "tom", "tom");
-		System.out.println(connection.getSchema());
+
 		return connection;
 	}
 

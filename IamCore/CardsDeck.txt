@@ -1,0 +1,41 @@
+Java Programming Test
+
+Goal of the evaluation:
+Evaluation of the ability to produce professional code.
+Subject:
+Realize a simple programming exercise, with a careful enforcement of the specifications, and be attentive to the produced code quality.
+You have to provide all the elements:
+-	Source code
+-	UML Class Diagram
+-	Etc.
+Specifications:
+-	The program should manage a data structure of 52 cards, each card having a value and a color.
+-	Initialize this data structure correctly (13 values and 4 colors), then display the list on the screen, enforcing this order: club, diamond, heart, spade.
+The result should be: 
+2 of club
+3 of club
+4 of club
+5 of club
+6 of club
+7 of club
+8 of club
+9 of club
+10 of club
+Jack of club
+Queen of club
+King of club
+Ace of club
+....
+2 of spade
+3 of spade
+4 of spade
+5 of spade
+6 of spade
+7 of spade
+8 of spade
+9 of spade
+10 of spade
+Jack of spade
+Queen of spade
+King of spade
+Ace of spade
